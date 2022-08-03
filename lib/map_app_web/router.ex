@@ -18,6 +18,7 @@ defmodule MapAppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/map", MapController, :index
   end
 
   # Other scopes may use custom stacks.

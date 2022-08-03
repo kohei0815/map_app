@@ -2,11 +2,11 @@
 
 ## プロジェクトの作成
 
-```
+``` elixir
 mix phx.new map_app --no-ecto
 ```
 
-```
+``` elixir
 * creating map_app/config/config.exs
 * creating map_app/config/dev.exs
 * creating map_app/config/prod.exs
@@ -78,3 +78,78 @@ cd map_app
 mix phx.server
 ```
 
+# メインページの作成
+
+## ルートの作成
+
+- map_app/map_app_web/router.ex
+
+``` elixir
+  scope "/", MapAppWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/map", MapController, :index
+  end
+```
+
+## コントローラーの作成
+
+- map_app/map_app_web/controllers/map_controller.ex
+
+``` elixir
+defmodule MapAppWeb.MapController do
+  use MapAppWeb, :controller
+
+  def index(conn, _params) do
+    render(conn, "index.html")
+  end
+end
+```
+
+## ビューの作成
+
+- map_app/map_app_web/views/map_view.ex
+
+``` elixir
+defmodule MapAppWeb.MapView do
+  use MapAppWeb, :view
+end
+```
+
+## テンプレートの作成
+
+- map_app/map_app_web/templates/map/index.html.heex
+
+``` elixir
+<div id="map" style="height: 500px"></div>
+<script>
+var map = L.map('map').setView([51.505, -0.09], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+L.marker([51.5, -0.09]).addTo(map)
+    .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+    .openPopup();
+</script>
+```
+
+## leafletjsの読み込み
+
+- map_app/map_app_web/templates/layout/root.html.heex
+
+``` elixir
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%= live_title_tag assigns[:page_title] || "MapApp", suffix: " · Phoenix Framework" %>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+  </head>
+```
